@@ -1,8 +1,53 @@
 #include <iostream>
-#include "ListaLigada.cpp"  // Asegúrate de incluir correctamente el archivo de la lista ligada
+#include "ListaLigada.cpp"  
+
+void cargarDatos(LSLSE<Alumno>& listaAlumnos) {
+    std::ifstream ArchivoAlumnoEntrada("Alumnos.txt", std::ios::in);
+    std::string nom,sex;
+    int edad; 
+    
+    if (!ArchivoAlumnoEntrada) {
+        std::cerr << "Error al abrir el archivo Alumnos.txt" << std::endl;
+        return;
+    }
+
+    Alumno alumno;
+    while (ArchivoAlumnoEntrada >> nom>>edad>>sex) {
+        alumno.setNombre(nom);
+        alumno.setEdad(edad);
+        alumno.setSexo(sex);
+        
+        listaAlumnos.insertar(alumno);
+
+
+    }
+
+    ArchivoAlumnoEntrada.close();
+}
+
+void GuardarInformacion(LSLSE<Alumno>&listaAlumnos){
+    node<Alumno>* aux;
+    aux = listaAlumnos.primero();
+
+    std::ofstream archivoAlumnosSalida;
+    archivoAlumnosSalida.open("Alumnos.txt", std::ios::out);
+
+
+    while (aux != nullptr){
+        Alumno Alum;
+        Alum = aux->getData();
+        archivoAlumnosSalida<<Alum.getNombre()<<" "<<Alum.getEdad()<<" "<<Alum.getSexo()<<std::endl;
+        aux = aux->getSiguiente();
+    }
+    archivoAlumnosSalida.close();
+    
+}
+
+
 
 int main() {
     LSLSE<Alumno> listaAlumnos;
+    cargarDatos(listaAlumnos);
     Alumno alumno("",0,"");
     std::string nom;
     Alumno AlumEliminar("", 0, "");
@@ -16,7 +61,7 @@ int main() {
         std::cout << "3. Imprimir Alumnos\n";
         std::cout << "4. Ordenar Alumnos\n";
         std::cout << "5. Salir\n";
-        std::cout << "Ingrese la opción: ";
+        std::cout << "Ingrese la opcion: ";
         std::cin >> opcion;
 
         switch (opcion) {
@@ -28,7 +73,7 @@ int main() {
             case 2: 
                 std::cout << "Dame el nombre del alumno: ";
                 std::cin >> nom;
-                AlumEliminar.setNombre(nom);     // Establece el nombre proporcionado
+                AlumEliminar.setNombre(nom);     
                 
                 pos = listaAlumnos.Busqueda(AlumEliminar);
                 if (pos != nullptr) {
@@ -47,6 +92,7 @@ int main() {
                 break;
             case 5:
                 std::cout << "Saliendo del programa.\n";
+                GuardarInformacion(listaAlumnos);
                 break;
             default:
                 std::cout << "Opción inválida. Intente de nuevo.\n";
@@ -56,3 +102,7 @@ int main() {
 
     return 0;
 }
+
+
+
+
