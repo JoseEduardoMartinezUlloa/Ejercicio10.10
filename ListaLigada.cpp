@@ -1,5 +1,6 @@
 #include <iostream>
 #include"Alumno.cpp"
+#include<fstream>
 
 template<class T>
 class LSLSE;
@@ -67,6 +68,7 @@ public:
     void imprimir()const;
     void Ordenamiento();
     node<T>* Busqueda(T);
+
 
 };
 
@@ -158,65 +160,65 @@ bool LSLSE<T>::vacia()const{
 
 template<class T>
 void LSLSE<T>::Ordenamiento() {
-    if (header == nullptr) {
-        return;
+    if (header == nullptr || header->getSiguiente() == nullptr) {
+        return; 
     }
 
-    node<T>* maleHead = nullptr;   // Cabeza de la lista de varones
-    node<T>* femaleHead = nullptr; // Cabeza de la lista de mujeres
+   
+    std::string primerGenero = header->getData().getSexo();
+    
     node<T>* current = header;
     node<T>* prev = nullptr;
+    
+    node<T>* currentGeneroActual = nullptr;
+    node<T>* currentGeneroOpuesto = nullptr;
 
     while (current != nullptr) {
-        if (current->getData().getSexo() == "M") {  // Compara el género del alumno
-            if (maleHead == nullptr) {
-                maleHead = current;
+        if (current->getData().getSexo() == primerGenero) {
+            if (currentGeneroActual == nullptr) {
+                currentGeneroActual = current;
                 prev = current;
                 current = current->getSiguiente();
-                prev->setSiguiente(nullptr); // Desconecta el nodo de la lista original
+                prev->setSiguiente(nullptr);
             } else {
                 prev->setSiguiente(current);
                 prev = current;
                 current = current->getSiguiente();
-                prev->setSiguiente(nullptr); // Desconecta el nodo de la lista original
+                prev->setSiguiente(nullptr); 
             }
-        } else if (current->getData().getSexo() == "F") {  // Compara el género del alumno
-            if (femaleHead == nullptr) {
-                femaleHead = current;
+        } else {
+            if (currentGeneroOpuesto == nullptr) {
+                currentGeneroOpuesto = current;
                 prev = current;
                 current = current->getSiguiente();
-                prev->setSiguiente(nullptr); // Desconecta el nodo de la lista original
+                prev->setSiguiente(nullptr); 
             } else {
                 prev->setSiguiente(current);
                 prev = current;
                 current = current->getSiguiente();
-                prev->setSiguiente(nullptr); // Desconecta el nodo de la lista original
+                prev->setSiguiente(nullptr); 
             }
         }
     }
 
-    // Conecta las dos listas (varones y mujeres) intercaladamente en la lista principal
-    if (maleHead != nullptr) {
-        header = maleHead;
-        node<T>* currentMale = maleHead;
-        node<T>* currentFemale = femaleHead;
+    header = currentGeneroActual;
+    node<T>* currentGeneroActualTemp = currentGeneroActual;
+    node<T>* currentGeneroOpuestoTemp = currentGeneroOpuesto;
 
-        while (currentMale != nullptr && currentFemale != nullptr) {
-            node<T>* tempMale = currentMale->getSiguiente();
-            node<T>* tempFemale = currentFemale->getSiguiente();
-            currentMale->setSiguiente(currentFemale);
-            currentFemale->setSiguiente(tempMale);
-            currentMale = tempMale;
-            currentFemale = tempFemale;
-        }
+    while (currentGeneroActualTemp != nullptr && currentGeneroOpuestoTemp != nullptr) {
+        node<T>* tempGeneroActual = currentGeneroActualTemp->getSiguiente();
+        node<T>* tempGeneroOpuesto = currentGeneroOpuestoTemp->getSiguiente();
+        currentGeneroActualTemp->setSiguiente(currentGeneroOpuestoTemp);
+        currentGeneroOpuestoTemp->setSiguiente(tempGeneroActual);
+        currentGeneroActualTemp = tempGeneroActual;
+        currentGeneroOpuestoTemp = tempGeneroOpuesto;
+    }
 
-        // Conecta el final de la lista de varones si quedan elementos
-        if (currentMale != nullptr) {
-            while (currentMale->getSiguiente() != nullptr) {
-                currentMale = currentMale->getSiguiente();
-            }
-            currentMale->setSiguiente(currentFemale);
+    if (currentGeneroActualTemp != nullptr) {
+        while (currentGeneroActualTemp->getSiguiente() != nullptr) {
+            currentGeneroActualTemp = currentGeneroActualTemp->getSiguiente();
         }
+        currentGeneroActualTemp->setSiguiente(currentGeneroOpuestoTemp);
     }
 }
 
@@ -230,3 +232,5 @@ node<T>* LSLSE<T>::Busqueda(T elm){
     return aux;
     
 }
+
+
